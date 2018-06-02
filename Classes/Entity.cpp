@@ -41,7 +41,8 @@ void Entity::Load(std::shared_ptr<Level> level, const char *spriteSheetName)
 void Entity::Unload()
 {
 	OnUnload();
-	mSprite->release();
+	mSprite->removeFromParent();
+	//mSprite->release();
 }
 
 void Entity::Update(const float deltaTime)

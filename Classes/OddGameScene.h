@@ -2,8 +2,10 @@
 
 #include "cocos2d.h"
 #include <memory>
-#include "Level.h"
 #include "Player.h"
+#include "NonPlayerCharacter.h"
+
+class Level;
 
 class OddGameScene : public cocos2d::Scene
 {
@@ -18,6 +20,7 @@ public:
 private:
 	std::unique_ptr<Player> mPlayer;
 	std::shared_ptr<Level> mLevel;
+	std::vector<std::unique_ptr<NonPlayerCharacter>> mNPCs;
 
 	uint32_t mInputBuffer = 0;
 	cocos2d::Layer* mGameLayer;

@@ -1,6 +1,7 @@
 #include "OddGameScene.h"
 #include "Entity.h"
-#include "Player.h"
+#include "Level.h"
+#include "NonPlayerCharacter.h"
 #include "SimpleAudioEngine.h"
 
 USING_NS_CC;
@@ -98,6 +99,33 @@ bool OddGameScene::init()
 void OddGameScene::update(float delta) 
 {
 	mPlayer->Update(delta);
+
+	static float spawnTimer = 0.f;
+	spawnTimer -= delta;
+	if (spawnTimer < 0.f) 
+	{
+		spawnTimer = cocos2d::RandomHelper::random_int(1, 2)*0.5f;
+		mNPCs.emplace_back(std::unique_ptr<NonPlayerCharacter>(new NonPlayerCharacter()));
+		auto& newNPC = mNPCs.back();
+		newNPC->Load(mLevel, "CloseSelected.png");
+		newNPC->SetParent(mGameLayer);
+		newNPC->SetPosition(Vec2(640, 192));
+	}
+
+	for (auto npc = mNPCs.begin(); npc != mNPCs.end(); ++npc) {
+
+		(*npc)->Update(delta);
+
+		if ((*npc)->GetPosition().x < 0.f) {
+			(*npc)->Unload();
+			npc = mNPCs.erase(npc);
+
+			if (npc == mNPCs.end()) {
+				break;
+			}
+		}
+	}
+
 }
 
 bool OddGameScene::IsButtonDown(const uint8_t button) const 
