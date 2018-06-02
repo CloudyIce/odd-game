@@ -1,8 +1,8 @@
 #include "AppDelegate.h"
-#include "HelloWorldScene.h"
+#include "OddGameScene.h"
 
 // #define USE_AUDIO_ENGINE 1
-// #define USE_SIMPLE_AUDIO_ENGINE 1
+#define USE_SIMPLE_AUDIO_ENGINE 1
 
 #if USE_AUDIO_ENGINE && USE_SIMPLE_AUDIO_ENGINE
 #error "Don't use AudioEngine and SimpleAudioEngine at the same time. Please just select one in your game!"
@@ -67,7 +67,9 @@ bool AppDelegate::applicationDidFinishLaunching() {
     }
 
     // turn on display FPS
+#ifdef _DEBUG
     director->setDisplayStats(true);
+#endif
 
     // set FPS. the default value is 1.0/60 if you don't call this
     director->setAnimationInterval(1.0f / 60);
@@ -94,7 +96,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
     register_all_packages();
 
     // create a scene. it's an autorelease object
-    auto scene = HelloWorld::createScene();
+    auto scene = OddGameScene::createScene();
 
     // run
     director->runWithScene(scene);
