@@ -5,6 +5,7 @@
 
 USING_NS_CC;
 
+
 Scene* OddGameScene::createScene()
 {
     return OddGameScene::create();
@@ -80,10 +81,17 @@ bool OddGameScene::init()
 	mUILayer = Layer::create();
 	this->addChild(mUILayer, 2);
 
+
+	mLevel = std::shared_ptr<Level>(new Level());
+	mLevel->Load();
+	mLevel->SetParent(mGameLayer);
+
 	mPlayer = std::unique_ptr<Player>(new Player([this](int button) {return IsButtonDown(button); }));
-	mPlayer->Load("CloseNormal.png");
+	mPlayer->Load(mLevel,"CloseNormal.png");
 	mPlayer->SetParent(mGameLayer);
 	mPlayer->SetPosition(Vec2(100, 100));
+
+
 	return true;
 }
 

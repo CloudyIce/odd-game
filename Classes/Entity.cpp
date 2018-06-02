@@ -1,11 +1,12 @@
 #include "Entity.h"
 #include <vector>
+#include "Level.h"
 
 USING_NS_CC;
 
 namespace 
 {
-	const int sTravelDistance = 3;
+	const int sTravelDistance = 20;
 	const float sEpsilon = 0.000001f;
 	const float sGravity = -50.f;
 	const float sEntityLayer = 10.f;
@@ -22,10 +23,11 @@ Entity::~Entity()
 {
 }
 
-void Entity::Load(const char *spriteSheetName, const cocos2d::Rect& defaultSprite)
+void Entity::Load(std::shared_ptr<Level> level, const char *spriteSheetName)
 {
-	mSprite = defaultSprite.equals(Rect()) ? Sprite::create(spriteSheetName, mDefaultSprite) : Sprite::create(spriteSheetName, defaultSprite);
+	mSprite = Sprite::create(spriteSheetName);
 	mSprite->setAnchorPoint(Vec2(0, 0));
+	mLevel = level;
 	OnLoad();
 }
 
@@ -126,8 +128,8 @@ void Entity::CheckCollisionOnAxis(float& changeInMovement, const cocos2d::Vec2& 
 
 uint8_t Entity::GetClosestCollision(float& closestCollision, const cocos2d::Vec2& startPoint, const cocos2d::Vec2& endPoint, const int direction, const float changeInMovement, const bool xAxis) const 
 {
-	// TODO
-	/*const int fromX = static_cast<int>(level->XPositionToTileCoordinate(startPoint.x));
+	auto level = mLevel;
+	const int fromX = static_cast<int>(level->XPositionToTileCoordinate(startPoint.x));
 	const int toX = static_cast<int>(level->XPositionToTileCoordinate(endPoint.x));
 	const int fromY = static_cast<int>(level->XPositionToTileCoordinate(startPoint.y));
 	const int toY = static_cast<int>(level->XPositionToTileCoordinate(endPoint.y));
@@ -145,8 +147,8 @@ uint8_t Entity::GetClosestCollision(float& closestCollision, const cocos2d::Vec2
 			const bool collided = CheckIsCollisionClosest(collisions > 0, closestCollision, tileReferencePoint, dPos, direction > 0);
 			collisions += static_cast<uint8_t>(collided);
 		}
-	}*/
-	return 0; //collisions;
+	}
+	return collisions;
 }
 
 bool Entity::CheckIsCollisionClosest(bool collided, float& closestCollision, const float potentialCollision, const float potentialNewPosition, const bool movingForward) const

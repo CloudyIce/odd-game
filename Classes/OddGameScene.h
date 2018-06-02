@@ -2,6 +2,7 @@
 
 #include "cocos2d.h"
 #include <memory>
+#include "Level.h"
 #include "Player.h"
 
 class OddGameScene : public cocos2d::Scene
@@ -16,6 +17,7 @@ public:
 	void SetButtonDown(const uint8_t button, const bool isDown);
 private:
 	std::unique_ptr<Player> mPlayer;
+	std::shared_ptr<Level> mLevel;
 
 	uint32_t mInputBuffer = 0;
 	cocos2d::Layer* mGameLayer;

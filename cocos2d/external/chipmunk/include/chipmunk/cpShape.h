@@ -33,7 +33,7 @@ typedef struct cpPointQueryInfo {
 	cpFloat distance;
 	/// The gradient of the signed distance function.
 	/// The value should be similar to info.p/info.d, but accurate even for very small values of info.d.
-	cpVect gradient;
+	cpVect mSky;
 } cpPointQueryInfo;
 
 /// Segment query info struct.

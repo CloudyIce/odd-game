@@ -3,13 +3,15 @@
 #include <memory>
 #include "cocos2d.h"
 
+class Level;
+
 class Entity
 {
 public:
 	Entity();
 	virtual ~Entity();
 
-	void Load(const char *spriteName, const cocos2d::Rect& defaultSprite = cocos2d::Rect());
+	void Load(std::shared_ptr<Level> level, const char *spriteName);
 	void Unload();
 	void Update(float deltaTime);
 
@@ -48,6 +50,7 @@ protected:
 	float mDefaultSpeed = 3000.f;
 	cocos2d::Rect mDefaultSprite;
 
+	std::shared_ptr<Level> mLevel;
 private:
 	cocos2d::Vec2 Move(const float deltaTime);
 	void CheckTileMapCollision(cocos2d::Vec2& changeInMovement);

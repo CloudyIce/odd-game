@@ -80,7 +80,10 @@ void Player::OnTick(const float deltaTime)
 		mJumpTimer = -1.f;
 	}
 
-	mSprite->setFlippedX(ddPos.x < 0);
+	if (ddPos.x != 0.f) 
+	{
+		mSprite->setFlippedX(ddPos.x < 0);
+	}
 
 	SetddPos(ddPos);
 }
