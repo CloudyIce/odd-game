@@ -6,7 +6,7 @@ USING_NS_CC;
 Player::Player(std::function<bool(int)> buttonDownFunction)
 	: mCheckButtonDownFunction(buttonDownFunction)
 {
-	mColliderSize = { 16, 48 };
+	mColliderSize = { 32, 48 };
 	mColliderOffset = { 8, 0 };
 	mDefaultSpeed = 4000.f;
 }
@@ -18,7 +18,7 @@ Player::~Player()
 
 bool Player::CanJump(const bool newJump) const {
 	//// if we're in the air above water return false
-	if (!IsOnGround()) 
+	if (!IsOnGround() && newJump) 
 	{
 		return false;
 	}

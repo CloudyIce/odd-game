@@ -80,42 +80,22 @@ float Level::PositionToTileCoordinate(const float position) const
 	return floorf((position / tileSize)+0.5f);
 }
 
-float Level::XPositionToTileCoordinate(const float x) const
-{
-	const auto tileSize = mTileSize.width;
-	return floorf(x / tileSize);
-}
-
-float Level::YPositionToTileCoordinate(const float y) const
-{
-	const auto tileSize = mTileSize.height;
-	const float levelHeightInPixels = mMap->getMapSize().height * tileSize;
-	return floorf((levelHeightInPixels - y) / tileSize);
-}
-
-const std::vector<cocos2d::Rect> Level::GetTilesInRangeAlongRow(const int y, const int from, const int to) const 
+const std::vector<cocos2d::Rect> Level::GetTilesAlongRow(const int y, const int direction) const
 {
 	std::vector<Rect> tiles;
 	const auto walls = mMap->getLayer(sCollisionLayerName);
-	CCASSERT(walls != nullptr, "Level::GetTilesInRange - Couldn't get collision layer!");
-	const auto mapsize = walls->getLayerSize();
+	const auto size = mMap->getMapSize().width;
 
-	//should be zero for our purposes, but implementing anyways
 	const auto yOffset = static_cast<int>(PositionToTileCoordinate(mMap->getPosition().y));
 	const int offsety = y - yOffset;
 
-	if (y >= mapsize.height || y < 0)
-	{
-		tiles;
-	}
-
-	const int direction = from > to ? -1 : 1;
-
 	const auto xOffset = static_cast<int>(PositionToTileCoordinate(mMap->getPosition().x));
-	const int offsetFrom = direction == 1 ? 0 : mMap->getMapSize().width;
-	const int offsetTo = direction == 1 ? mMap->getMapSize().width : 0;
+	int from = direction > 0 ? 0 : size;
+	int to = direction > 0 ? size : 0;
+	from -= xOffset;
+	to -= xOffset;
 
-	for (int x = offsetFrom; x != offsetTo; x += direction)
+	for (int x = from; x != to; x += direction)
 	{
 		const auto tile = GetTileCollider(Vec2(x, offsety), walls, Vec2(xOffset, yOffset));
 		if (tile.equals(Rect::ZERO))
@@ -128,29 +108,23 @@ const std::vector<cocos2d::Rect> Level::GetTilesInRangeAlongRow(const int y, con
 	return tiles;
 }
 
-const std::vector<cocos2d::Rect> Level::GetTilesInRangeAlongColumn(const int x, const int from, const int to) const 
+const std::vector<cocos2d::Rect> Level::GetTilesAlongColumn(const int x, const int direction) const 
 {
 	std::vector<Rect> tiles;
 	const auto walls = mMap->getLayer(sCollisionLayerName);
-	CCASSERT(walls != nullptr, "Level::GetTilesInRange - Couldn't get collision layer!");
-	const auto mapsize = walls->getLayerSize();
+	const auto size = mMap->getMapSize().height;
 
 	const auto xOffset = static_cast<int>(PositionToTileCoordinate(mMap->getPosition().x));
 	const int offsetX = x - xOffset;
 
-	if (offsetX >= mapsize.width || offsetX < 0)
-	{
-		return tiles;
-	}
-
-	const int direction = from > to ? -1 : 1;
-
 	const auto yOffset = static_cast<int>(PositionToTileCoordinate(mMap->getPosition().y));
-	const int offsetFrom = direction == 1 ? 0 : mMap->getMapSize().height;
-	const int offsetTo = direction == 1 ? mMap->getMapSize().height: 0 ;
-		
+	int from = direction > 0 ? 0 : size;
+	int to = direction > 0 ? size : 0;
+	from -= yOffset;
+	to -= yOffset;
+
 	// have to include last tile here
-	for (int y = offsetFrom; y != offsetTo + direction; y += direction)
+	for (int y = from; y != (to + direction); y += direction)
 	{
 		const auto tile = GetTileCollider(Vec2(offsetX, y), walls, Vec2(xOffset, yOffset));
 		// Check if valid tile

@@ -54,8 +54,8 @@ protected:
 private:
 	cocos2d::Vec2 Move(const float deltaTime);
 	void CheckTileMapCollision(cocos2d::Vec2& changeInMovement);
-	void CheckCollisionOnAxis(float& changeInMovement, const cocos2d::Vec2& startPoint, const cocos2d::Vec2& endPoint, const bool xAxis);
-	uint8_t GetClosestCollision(float& closestCollision, const cocos2d::Vec2& startPoint, const cocos2d::Vec2& endPoint, const int direction, const float changeInMovement, const bool xAxis) const;
+	void CheckCollisionOnAxis(float& changeInMovement, const float collidingEdge, const float from, const float to, const bool xAxis);
+	uint8_t GetClosestCollision(float& closestCollision, const float collidingEdge, const float from, const float to, const int direction, const float changeInMovement, const bool xAxis) const;
 	bool CheckIsCollisionClosest(bool collided, float& closestCollision, const float potentialCollision, const float potentialNewPosition, const bool movingForward) const;
 
 private:
@@ -69,4 +69,11 @@ private:
 	bool mAlive = false;
 
 	bool mIsGrounded = false;
+
+
+#ifdef _DEBUG
+	cocos2d::Label* mDebugLabel = nullptr;
+	cocos2d::Color4F mDebugDrawColor = cocos2d::Color4F(cocos2d::Color3B::RED, 160);
+	cocos2d::DrawNode* mDebugDrawCollider = nullptr;
+#endif
 };

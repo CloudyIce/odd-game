@@ -23,7 +23,7 @@ private:
 
 	const float mJumpFrequency = 0.25f;
 	const float mJumpLength = 0.5f;
-	const float mJumpVelocity = 2000.f;
+	const float mJumpVelocity = 200.f;
 	float mJumpTimer = -1.f;
 	float mJumpDelayTimer = -1.f;
 	bool mHoldingJump = false;

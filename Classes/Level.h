@@ -19,11 +19,9 @@ public:
 	float TileCoordinateToPosition(const float position) const;
 	cocos2d::Vec2 PositionToTileCoordinate(const cocos2d::Vec2& position) const;
 	float PositionToTileCoordinate(const float position) const;
-	float XPositionToTileCoordinate(const float x) const;
-	float YPositionToTileCoordinate(const float y) const;
 
-	const std::vector<cocos2d::Rect> GetTilesInRangeAlongRow(const int y, const int from, const int to) const;
-	const std::vector<cocos2d::Rect> GetTilesInRangeAlongColumn(const int x, const int from, const int to) const;
+	const std::vector<cocos2d::Rect> GetTilesAlongRow(const int y, const int direction) const;
+	const std::vector<cocos2d::Rect> GetTilesAlongColumn(const int x, const int direction) const;
 
 	const cocos2d::Vec2 GetTileSize() const;
 

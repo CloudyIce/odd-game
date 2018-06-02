@@ -6,7 +6,6 @@ USING_NS_CC;
 
 namespace 
 {
-	const int sTravelDistance = 20;
 	const float sEpsilon = 0.000001f;
 	const float sGravity = -50.f;
 	const float sEntityLayer = 10.f;
@@ -29,6 +28,14 @@ void Entity::Load(std::shared_ptr<Level> level, const char *spriteSheetName)
 	mSprite->setAnchorPoint(Vec2(0, 0));
 	mLevel = level;
 	OnLoad();
+
+#ifdef _DEBUG
+	mDebugLabel = cocos2d::Label::createWithSystemFont("", "Arial", 20);
+	mDebugLabel->setPosition(cocos2d::Vec2(0, -20));
+	mDebugLabel->retain();
+	mSprite->addChild(mDebugLabel);
+	mDebugDrawCollider = DrawNode::create();
+#endif
 }
 
 void Entity::Unload()
@@ -55,12 +62,24 @@ void Entity::Update(const float deltaTime)
 	
 	mSprite->setPosition(mPos - mColliderOffset);
 	mCollider.setRect(mPos.x, mPos.y, mColliderSize.x, mColliderSize.y);
+
+#ifdef _DEBUG
+	mDebugDrawCollider->clear();
+	mDebugDrawCollider->drawRect(mPos, mPos + mCollider.size, mDebugDrawColor);
+	const auto tilePos = mLevel->PositionToTileCoordinate(mPos);
+	std::string debugTilePos = std::to_string(static_cast<int>(tilePos.x)) + "," + std::to_string(static_cast<int>(tilePos.y));
+	mDebugLabel->setString(debugTilePos);
+#endif
 }
 
 void Entity::SetParent(cocos2d::Node* parent)
 {
 	parent->addChild(mSprite, sEntityLayer);
 	OnSetParent(parent);
+
+#ifdef _DEBUG
+	parent->addChild(mDebugDrawCollider, sEntityLayer + 1);
+#endif
 }
 
 Vec2 Entity::Move(const float deltaTime)
@@ -85,21 +104,21 @@ void Entity::CheckTileMapCollision(Vec2& changeInMovement)
 	const int tileSize = 32;//static_cast<int>(tilemap->GetTileSize().x);
 	if(changeInMovement.x > 0)
 	{
-		CheckCollisionOnAxis(changeInMovement.x, Vec2(mCollider.getMaxX(), mPos.y), Vec2(mPos.x + sTravelDistance * tileSize, mCollider.getMaxY()), true);
+		CheckCollisionOnAxis(changeInMovement.x, mCollider.getMaxX(), mCollider.getMinY(), mCollider.getMaxY(), true);
 	}
 	else if (changeInMovement.x < 0) {
-		CheckCollisionOnAxis(changeInMovement.x, Vec2(mCollider.getMinX(), mPos.y), Vec2(mPos.x - sTravelDistance * tileSize, mCollider.getMaxY()), true);
+		CheckCollisionOnAxis(changeInMovement.x, mCollider.getMinX(), mCollider.getMinY(), mCollider.getMaxY(), true);
 	}
 	
 	if (changeInMovement.y > 0) {
-		CheckCollisionOnAxis(changeInMovement.y, Vec2(mCollider.getMaxY(), mPos.x), Vec2(mPos.y + sTravelDistance * tileSize, mCollider.getMaxX()), false);
+		CheckCollisionOnAxis(changeInMovement.y, mCollider.getMaxY(), mCollider.getMinX(), mCollider.getMaxX(), false);
 	}
 	else if (changeInMovement.y < 0) {
-		CheckCollisionOnAxis(changeInMovement.y, Vec2(mCollider.getMinY(), mPos.x), Vec2(mPos.y - sTravelDistance * tileSize, mCollider.getMaxX()), false);
+		CheckCollisionOnAxis(changeInMovement.y, mCollider.getMinY(), mCollider.getMinX(), mCollider.getMaxX(), false);
 	}
 }
 
-void Entity::CheckCollisionOnAxis(float& changeInMovement, const cocos2d::Vec2& startPoint, const cocos2d::Vec2& endPoint, const bool xAxis)
+void Entity::CheckCollisionOnAxis(float& changeInMovement, const float collidingEdge, const float from, const float to, const bool xAxis)
 {
 	const int direction = changeInMovement > 0 ? 1 : -1;
 
@@ -107,7 +126,7 @@ void Entity::CheckCollisionOnAxis(float& changeInMovement, const cocos2d::Vec2& 
 	// So if the Entity is 2 tiles tall (64 units) then we should fill up the above vector with 2-3 rows to look at.
 
 	float closestCollision = 0.f;
-	uint8_t collisions = GetClosestCollision(closestCollision, startPoint, endPoint, direction, changeInMovement, xAxis);
+	uint8_t collisions = GetClosestCollision(closestCollision, collidingEdge, from, to, direction, changeInMovement, xAxis);
 
 	// no collisions
 	if (collisions == 0) 
@@ -116,7 +135,7 @@ void Entity::CheckCollisionOnAxis(float& changeInMovement, const cocos2d::Vec2& 
 	}
 
 	// our change in movement on the collided axis now needs to be reduced so it is lower then collidedAt
-	const auto distanceToCollision = fabs(startPoint.x - closestCollision);
+	const auto distanceToCollision = fabs(collidingEdge - closestCollision);
 
 	if (fabs(changeInMovement) < distanceToCollision) 
 	{
@@ -126,20 +145,18 @@ void Entity::CheckCollisionOnAxis(float& changeInMovement, const cocos2d::Vec2& 
 }
 
 
-uint8_t Entity::GetClosestCollision(float& closestCollision, const cocos2d::Vec2& startPoint, const cocos2d::Vec2& endPoint, const int direction, const float changeInMovement, const bool xAxis) const 
+uint8_t Entity::GetClosestCollision(float& closestCollision, const float collidingEdge, const float from, const float to, const int direction, const float changeInMovement, const bool xAxis) const
 {
 	auto level = mLevel;
-	const int fromX = static_cast<int>(level->XPositionToTileCoordinate(startPoint.x));
-	const int toX = static_cast<int>(level->XPositionToTileCoordinate(endPoint.x));
-	const int fromY = static_cast<int>(level->XPositionToTileCoordinate(startPoint.y));
-	const int toY = static_cast<int>(level->XPositionToTileCoordinate(endPoint.y));
+	const int fromY = static_cast<int>(level->PositionToTileCoordinate(from));
+	const int toY = static_cast<int>(level->PositionToTileCoordinate(to));
 	const int tileSize = static_cast<int>(level->GetTileSize().x);
 
-	const float dPos = startPoint.x + changeInMovement;
+	const float dPos = collidingEdge + changeInMovement;
 
 	uint8_t collisions = 0;
 	for (int row = fromY; row <= toY; ++row) {
-		const auto tiles = xAxis ? level->GetTilesInRangeAlongRow(row, fromX, toX) : level->GetTilesInRangeAlongColumn(row, fromX, toX);
+		const auto tiles = xAxis ? level->GetTilesAlongRow(row, direction) : level->GetTilesAlongColumn(row, direction);
 		// Find colliding tiles if any
 		for (auto&& tile : tiles) {
 			// Save the "closest" collided tile so we can use this for our collision
