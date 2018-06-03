@@ -201,7 +201,6 @@ void OddGameScene::update(float delta)
 		
 		auto* sequence = Sequence::create(mWinDelay, onComplete, nullptr);
 		mFadeInOutOverlay->runAction(sequence);
->>>>>>> daniel/test
 	}
 
 	const auto cameraPosition = getDefaultCamera()->getPosition();
