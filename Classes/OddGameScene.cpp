@@ -109,14 +109,14 @@ void OddGameScene::update(float delta)
 		auto& newNPC = mNPCs.back();
 		newNPC->Load(mLevel, "CloseSelected.png");
 
-		if(cocos2d::RandomHelper::random_int(1,2) == 1) 
+		if(cocos2d::RandomHelper::random_int(-2,2) > 1) 
 		{
-			newNPC->SetPosition(Vec2(mLevel->GetMapSize().x, 192));
+			newNPC->SetPosition(Vec2((mLevel->GetMapSize().x*32)-10, 192));
 			newNPC->SetDirection(-1);
 		}
 		else
 		{
-			newNPC->SetPosition(Vec2(0,192));
+			newNPC->SetPosition(Vec2(10,192));
 			newNPC->SetDirection(1);
 		}
 		
@@ -134,7 +134,7 @@ void OddGameScene::update(float delta)
 			mPlayer->Knockback((*npc)->GetPosition(),1000.f);
 		}
 
-		if ((*npc)->GetPosition().x < 0.f || (*npc)->GetPosition().x > mLevel->GetMapSize().x ) 
+		if ((*npc)->GetPosition().x < 0.f || (*npc)->GetPosition().x > (mLevel->GetMapSize().x*32) ) 
 		{
 			(*npc)->Unload();
 			npc = mNPCs.erase(npc);
