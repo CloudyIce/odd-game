@@ -30,6 +30,17 @@ void NonPlayerCharacter::OnTick(const float deltaTime)
 		mSprite->setFlippedX(ddPos.x < 0);
 	}
 
+	if (IsOnGround() && cocos2d::RandomHelper::random_int(1, mChanceOfJumping) == 1) {
+		mJumpLength = cocos2d::RandomHelper::random_int(static_cast<int>(mJumpLengthMin * 10.f), static_cast<int>(mJumpLengthMax * 10.f))*0.1f;
+		mJumpTimer = mJumpLength;
+	}
+
+	mJumpTimer -= deltaTime;
+	if (mJumpTimer > 0.f) {
+		// We want to slow it when we get to the peak, so we use mJumpTimer/Length to give us a slope
+		AddVelocity(Vec2(0, mJumpVelocity*(mJumpTimer / mJumpLength)));
+	}
+
 	SetddPos(ddPos);
 }
 

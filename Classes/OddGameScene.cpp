@@ -157,13 +157,8 @@ void OddGameScene::update(float delta)
 		for (auto npc = mNPCs.begin(); npc != mNPCs.end(); ++npc)
 		{
 			(*npc)->Unload();
-			npc = mNPCs.erase(npc);
-
-			if (npc == mNPCs.end())
-			{
-				break;
-			}
 		}
+		mNPCs.clear();
 	}
 
 }

@@ -20,7 +20,11 @@ private:
 	//cocos2d::Animate* mCurrentAnimation;
 	float mIntentDirection = 1.f;
 
-	const float mJumpFrequency = 0.25f;
-	const float mJumpLength = 0.5f;
-	const float mJumpVelocity = 200.f;
+	const float mJumpLengthMin = 0.4f;
+	const float mJumpLengthMax = 0.8f;
+	float mJumpLength = mJumpLengthMin;
+	const float mJumpVelocity = 500.f;
+	float mJumpTimer = -1.f;
+
+	int mChanceOfJumping = 200;
 };
