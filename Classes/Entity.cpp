@@ -7,7 +7,7 @@ USING_NS_CC;
 namespace 
 {
 	const float sEpsilon = 0.000001f;
-	const float sGravity = -50.f;
+	const float sGravity = -200.f;
 	const float sEntityLayer = 10.f;
 }
 

@@ -3,6 +3,12 @@
 
 USING_NS_CC;
 
+namespace {
+
+	constexpr float sBonusUpHitForce = 0.5f;
+
+}
+
 Player::Player(std::function<bool(int)> buttonDownFunction)
 	: mCheckButtonDownFunction(buttonDownFunction)
 {
@@ -25,12 +31,11 @@ void Player::Knockback(const cocos2d::Vec2& hitDirection, const float force)
 	
 	mInvulnTimer = mMaxInvulnTime;
 	// StartBlinking or change sprite
-	mSprite->setOpacity(0.5f);
+	mSprite->setOpacity(50);
 	
 	auto hitForce = GetPosition()-hitDirection;
-	hitForce*=-1.f;
 	hitForce.normalize();
-	hitForce.y = fabsf(hitForce.y);
+	hitForce.y = fabsf(hitForce.y) + sBonusUpHitForce;
 	hitForce*=force;
 	
 	AddVelocity(hitForce);
@@ -72,14 +77,10 @@ void Player::OnTick(const float deltaTime)
 		}
 	}
 	
-	if(mInvulnTimer > 0.f) 
+	mInvulnTimer -= deltaTime;
+	if (mInvulnTimer <= 0.f)
 	{
-		mInvulnTimer -= deltaTime;
-		if(mInvulnTimer <= 0.f)
-		{
-			mSprite->setOpacity(1.0f);
-			// Maybe have no input during this??
-		}
+		mSprite->setOpacity(100);
 	}
 
 	//

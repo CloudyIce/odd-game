@@ -90,7 +90,7 @@ bool OddGameScene::init()
 	mPlayer = std::unique_ptr<Player>(new Player([this](int button) {return IsButtonDown(button); }));
 	mPlayer->Load(mLevel,"CloseNormal.png");
 	mPlayer->SetParent(mGameLayer);
-	mPlayer->SetPosition(Vec2(100, 100));
+	mPlayer->SetPosition(Vec2(300, 100));
 
 
 	return true;
@@ -131,7 +131,7 @@ void OddGameScene::update(float delta)
 		
 		if((*npc)->GetCollider().intersectsRect(mPlayer->GetCollider()))
 		{
-			mPlayer->Knockback((*npc)->GetPosition(),1000.f);
+			mPlayer->Knockback((*npc)->GetPosition(), (*npc)->GetSpeed());
 		}
 
 		if ((*npc)->GetPosition().x < 0.f || (*npc)->GetPosition().x > (mLevel->GetMapSize().x*32) ) 
