@@ -24,6 +24,7 @@ public:
 	const std::vector<cocos2d::Rect> GetTilesAlongColumn(const int x, const int direction) const;
 
 	const cocos2d::Vec2 GetTileSize() const;
+	const cocos2d::Vec2 GetMapSize() const;
 
 	void OnPlayerCameraUpdated(const cocos2d::Vec2& position);
 

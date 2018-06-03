@@ -9,6 +9,7 @@ public:
 	NonPlayerCharacter();
 	virtual ~NonPlayerCharacter();
 
+	void SetDirection(const int dir);
 private:
 	virtual void OnTick(const float deltaTime) override;
 	virtual void OnSetParent(cocos2d::Node* parent) override;
@@ -17,6 +18,7 @@ private:
 private:
 	//cocos2d::Animation* mAnimation;
 	//cocos2d::Animate* mCurrentAnimation;
+	float mIntentDirection = 1.f;
 
 	const float mJumpFrequency = 0.25f;
 	const float mJumpLength = 0.5f;

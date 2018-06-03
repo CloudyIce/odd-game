@@ -143,6 +143,11 @@ const cocos2d::Vec2 Level::GetTileSize() const
 	return mTileSize;
 }
 
+const cocos2d::Vec2 Level::GetMapSize() const
+{
+	return mMap->getMapSize();	
+}
+
 void Level::OnPlayerCameraUpdated(const cocos2d::Vec2& position)
 {
 	mSky->setPosition(position - mSky->getContentSize()*0.5f);

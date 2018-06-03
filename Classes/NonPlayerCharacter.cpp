@@ -15,10 +15,15 @@ NonPlayerCharacter::~NonPlayerCharacter()
 
 }
 
+void NonPlayerCharacter::SetDirection(const int dir)
+{
+	mIntentDirection = dir;
+}
+
 void NonPlayerCharacter::OnTick(const float deltaTime) 
 {
 	Vec2 ddPos(0.0f, 0.0f);
-	ddPos.x = -1.0f;
+	ddPos.x = mIntentDirection;
 
 	if (ddPos.x != 0.f) 
 	{

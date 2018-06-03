@@ -8,6 +8,8 @@ class Player : public Entity
 public:
 	Player(std::function<bool(int)> buttonDownFunction);
 	virtual ~Player();
+	
+	void Knockback(const cocos2d::Vec2& hitDirection, const float force);
 
 private:
 	bool CanJump(const bool newJump) const;
@@ -20,6 +22,8 @@ private:
 private:
 	//cocos2d::Animation* mAnimation;
 	//cocos2d::Animate* mCurrentAnimation;
+	const float mMaxInvulnTime = 1.f;
+	float mInvulnTimer = -1.f;
 
 	const float mJumpFrequency = 0.25f;
 	const float mJumpLength = 0.5f;

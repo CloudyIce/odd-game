@@ -104,23 +104,43 @@ void OddGameScene::update(float delta)
 	spawnTimer -= delta;
 	if (spawnTimer < 0.f) 
 	{
-		spawnTimer = cocos2d::RandomHelper::random_int(1, 2)*0.5f;
+		spawnTimer = cocos2d::RandomHelper::random_int(1, 4)*0.25f;
 		mNPCs.emplace_back(std::unique_ptr<NonPlayerCharacter>(new NonPlayerCharacter()));
 		auto& newNPC = mNPCs.back();
 		newNPC->Load(mLevel, "CloseSelected.png");
+
+		if(cocos2d::RandomHelper::random_int(1,2) == 1) 
+		{
+			newNPC->SetPosition(Vec2(mLevel->GetMapSize().x, 192));
+			newNPC->SetDirection(-1);
+		}
+		else
+		{
+			newNPC->SetPosition(Vec2(0,192));
+			newNPC->SetDirection(1);
+		}
+		
 		newNPC->SetParent(mGameLayer);
-		newNPC->SetPosition(Vec2(640, 192));
+
 	}
 
-	for (auto npc = mNPCs.begin(); npc != mNPCs.end(); ++npc) {
+	for (auto npc = mNPCs.begin(); npc != mNPCs.end(); ++npc) 
+	{
 
 		(*npc)->Update(delta);
+		
+		if((*npc)->GetCollider().intersectsRect(mPlayer->GetCollider()))
+		{
+			mPlayer->Knockback((*npc)->GetPosition(),1000.f);
+		}
 
-		if ((*npc)->GetPosition().x < 0.f) {
+		if ((*npc)->GetPosition().x < 0.f || (*npc)->GetPosition().x > mLevel->GetMapSize().x ) 
+		{
 			(*npc)->Unload();
 			npc = mNPCs.erase(npc);
 
-			if (npc == mNPCs.end()) {
+			if (npc == mNPCs.end()) 
+			{
 				break;
 			}
 		}

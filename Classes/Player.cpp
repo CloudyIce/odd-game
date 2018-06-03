@@ -16,7 +16,28 @@ Player::~Player()
 
 }
 
-bool Player::CanJump(const bool newJump) const {
+void Player::Knockback(const cocos2d::Vec2& hitDirection, const float force)
+{
+	if(mInvulnTimer > 0.f) 
+	{
+		return;
+	}
+	
+	mInvulnTimer = mMaxInvulnTime;
+	// StartBlinking or change sprite
+	mSprite->setOpacity(0.5f);
+	
+	auto hitForce = GetPosition()-hitDirection;
+	hitForce*=-1.f;
+	hitForce.normalize();
+	hitForce.y = fabsf(hitForce.y);
+	hitForce*=force;
+	
+	AddVelocity(hitForce);
+}
+
+bool Player::CanJump(const bool newJump) const 
+{
 	//// if we're in the air above water return false
 	if (!IsOnGround() && newJump) 
 	{
@@ -48,6 +69,16 @@ void Player::OnTick(const float deltaTime)
 		mJumpDelayTimer -= deltaTime;
 		if (mHoldingJump) {
 			mJumpTimer -= deltaTime;
+		}
+	}
+	
+	if(mInvulnTimer > 0.f) 
+	{
+		mInvulnTimer -= deltaTime;
+		if(mInvulnTimer <= 0.f)
+		{
+			mSprite->setOpacity(1.0f);
+			// Maybe have no input during this??
 		}
 	}
 
