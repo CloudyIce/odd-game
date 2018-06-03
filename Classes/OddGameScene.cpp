@@ -6,6 +6,11 @@
 
 USING_NS_CC;
 
+namespace 
+{
+	constexpr float sEndY = 1920.f;
+}
+
 
 Scene* OddGameScene::createScene()
 {
@@ -111,17 +116,16 @@ void OddGameScene::update(float delta)
 
 		if(cocos2d::RandomHelper::random_int(-2,2) > 1) 
 		{
-			newNPC->SetPosition(Vec2((mLevel->GetMapSize().x*32)-10, 192));
+			newNPC->SetPosition(Vec2((mLevel->GetMapSize().x*32)-10, (mLevel->GetMapSize().y * 32)+32));
 			newNPC->SetDirection(-1);
 		}
 		else
 		{
-			newNPC->SetPosition(Vec2(10,192));
+			newNPC->SetPosition(Vec2(10, (mLevel->GetMapSize().y * 32) + 32));
 			newNPC->SetDirection(1);
 		}
 		
 		newNPC->SetParent(mGameLayer);
-
 	}
 
 	for (auto npc = mNPCs.begin(); npc != mNPCs.end(); ++npc) 
@@ -131,7 +135,7 @@ void OddGameScene::update(float delta)
 		
 		if((*npc)->GetCollider().intersectsRect(mPlayer->GetCollider()))
 		{
-			mPlayer->Knockback((*npc)->GetPosition(), (*npc)->GetSpeed());
+			mPlayer->Knockback((*npc)->GetPosition(), (*npc)->GetSpeed()*0.5f);
 		}
 
 		if ((*npc)->GetPosition().x < 0.f || (*npc)->GetPosition().x > (mLevel->GetMapSize().x*32) ) 
@@ -140,6 +144,22 @@ void OddGameScene::update(float delta)
 			npc = mNPCs.erase(npc);
 
 			if (npc == mNPCs.end()) 
+			{
+				break;
+			}
+		}
+	}
+
+	if (mPlayer->GetPosition().x >= sEndY)
+	{
+		// Win!!
+		mPlayer->SetPosition(Vec2(300, 100));
+		for (auto npc = mNPCs.begin(); npc != mNPCs.end(); ++npc)
+		{
+			(*npc)->Unload();
+			npc = mNPCs.erase(npc);
+
+			if (npc == mNPCs.end())
 			{
 				break;
 			}

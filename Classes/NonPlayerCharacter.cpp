@@ -7,7 +7,7 @@ NonPlayerCharacter::NonPlayerCharacter()
 {
 	mColliderSize = { 32, 48 };
 	mColliderOffset = { 8, 0 };
-	mDefaultSpeed = 1000.f * cocos2d::RandomHelper::random_int(10, 20);;
+	mDefaultSpeed = 1000.f * cocos2d::RandomHelper::random_int(2, 5);
 }
 
 NonPlayerCharacter::~NonPlayerCharacter()
@@ -39,6 +39,7 @@ void NonPlayerCharacter::OnSetParent(cocos2d::Node* parent)
 
 void NonPlayerCharacter::OnLoad()
 {
+
 }
 
 void NonPlayerCharacter::OnUnload() 

@@ -47,7 +47,7 @@ protected:
 	cocos2d::Vec2 mColliderSize = { 24, 24 };
 	cocos2d::Vec2 mColliderOffset = { 8, 8 };
 
-	float mDefaultSpeed = 3000.f;
+	float mDefaultSpeed;
 	cocos2d::Rect mDefaultSprite;
 
 	std::shared_ptr<Level> mLevel;

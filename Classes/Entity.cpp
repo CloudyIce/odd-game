@@ -12,8 +12,8 @@ namespace
 }
 
 Entity::Entity()
+	: mDefaultSpeed(3000.f)
 {
-	mSpeed = mDefaultSpeed;
 	mCollider.setRect(mPos.x + mColliderOffset.x, mPos.y + mColliderOffset.y, mColliderSize.x, mColliderSize.y);
 	mAlive = true;
 }
@@ -36,11 +36,16 @@ void Entity::Load(std::shared_ptr<Level> level, const char *spriteSheetName)
 	mSprite->addChild(mDebugLabel);
 	mDebugDrawCollider = DrawNode::create();
 #endif
+	mSpeed = mDefaultSpeed;
 }
 
 void Entity::Unload()
 {
 	OnUnload();
+#ifdef _DEBUG
+	mDebugLabel->release();
+	mDebugDrawCollider->clear();
+#endif
 	mSprite->removeFromParent();
 	//mSprite->release();
 }
