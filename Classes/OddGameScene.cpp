@@ -124,8 +124,8 @@ bool OddGameScene::init()
 	// score text
 	{
 		TTFConfig labelConfig;
-		labelConfig.fontFilePath = "1980XX.ttf";
-		labelConfig.fontSize = 64;
+		labelConfig.fontFilePath = "Helvetica-Regular.ttf";
+		labelConfig.fontSize = 24;
 		labelConfig.glyphs = GlyphCollection::DYNAMIC;
 		labelConfig.outlineSize = 0;
 		labelConfig.customGlyphs = nullptr;
@@ -135,6 +135,8 @@ bool OddGameScene::init()
 		mScoreText->setTextColor(Color4B::WHITE);
 		mScoreText->setPosition(32, 32);
 		mScoreText->getFontAtlas()->setAliasTexParameters();
+		mScoreText->setScale(2.0f);
+		mScoreText->setAnchorPoint(Vec2(0, 1));
 		addChild(mScoreText);
 
 		updateScore(0);
@@ -233,7 +235,7 @@ void OddGameScene::update(float delta)
 	}
 
 	const auto screenSize = Director::getInstance()->getVisibleSize();
-	mScoreText->setPosition(getDefaultCamera()->getPosition().x - Director::getInstance()->getVisibleSize().width * 0.5f + mScoreText->getContentSize().width * 0.5f +16,
+	mScoreText->setPosition(getDefaultCamera()->getPosition().x - Director::getInstance()->getVisibleSize().width * 0.5f + mScoreText->getContentSize().width * 0.5f - 32,
 						getDefaultCamera()->getPosition().y - Director::getInstance()->getVisibleSize().height * -0.5f + mScoreText->getContentSize().height * -0.5f);
 
 	const auto cameraPosition = getDefaultCamera()->getPosition();
