@@ -10,6 +10,8 @@ public:
 	virtual ~NonPlayerCharacter();
 
 	void SetDirection(const int dir);
+
+	void SetSpeedModifier(const int mod);
 private:
 	virtual void OnTick(const float deltaTime) override;
 	virtual void OnSetParent(cocos2d::Node* parent) override;

@@ -25,6 +25,15 @@ void NonPlayerCharacter::SetDirection(const int dir)
 	mIntentDirection = dir;
 }
 
+void NonPlayerCharacter::SetSpeedModifier(const int mod)
+{
+	SetSpeed(mDefaultSpeed + (mDefaultSpeed*(mod*0.1)));
+	mChanceOfJumping -= mod * 5;
+	if (mChanceOfJumping < 25) {
+		mChanceOfJumping = 25;
+	}
+}
+
 void NonPlayerCharacter::OnTick(const float deltaTime) 
 {
 	Vec2 ddPos(0.0f, 0.0f);

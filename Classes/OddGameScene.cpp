@@ -187,14 +187,14 @@ void OddGameScene::update(float delta)
 	spawnTimer -= delta;
 	if (spawnTimer < 0.f) 
 	{
-		spawnTimer = cocos2d::RandomHelper::random_int(1, 4)*0.25f;
+		spawnTimer = (cocos2d::RandomHelper::random_int(1, 4)*0.25f) / (mScore+1);
 		mNPCs.emplace_back(std::unique_ptr<NonPlayerCharacter>(new NonPlayerCharacter()));
 		auto& newNPC = mNPCs.back();
 		newNPC->Load(mLevel, "CloseSelected.png");
 
 		if(cocos2d::RandomHelper::random_int(-2,2) > 1) 
 		{
-			newNPC->SetPosition(Vec2((mLevel->GetMapSize().x*32)-10 -(32*19), (mLevel->GetMapSize().y * 32)+128));
+			newNPC->SetPosition(Vec2((mLevel->GetMapSize().x*32)-10 -(32*24), (mLevel->GetMapSize().y * 32)+128));
 			newNPC->SetDirection(-1);
 		}
 		else
@@ -204,6 +204,7 @@ void OddGameScene::update(float delta)
 		}
 		
 		newNPC->SetParent(mGameLayer);
+		newNPC->SetSpeedModifier(mScore + 1);
 	}
 
 	for (auto npc = mNPCs.begin(); npc != mNPCs.end(); ++npc) 
