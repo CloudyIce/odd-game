@@ -1,3 +1,6 @@
+#include <sstream>
+#include <iomanip>
+
 #include "2d/CCDrawNode.h"
 #include "GL/glew.h"
 
@@ -118,18 +121,40 @@ bool OddGameScene::init()
 	p->updateUniforms();
 	CHECK_GL_ERROR_DEBUG();
 
-	const auto screenSize = Director::getInstance()->getVisibleSize();
-	mFadeInOutOverlay = cocos2d::DrawNode::create();
-	Vec2 rectanglePoints[4];
-	rectanglePoints[0] = Vec2(screenSize.width / 2, screenSize.height / 2) * -1;
-	rectanglePoints[1] = Vec2(screenSize.width / 2, screenSize.height / 2 * -1);
-	rectanglePoints[2] = Vec2(screenSize.width / 2, screenSize.height / 2);
-	rectanglePoints[3] = Vec2(screenSize.width / 2 * -1, screenSize.height / 2);
-	Color4F black(1, 0, 0, 1);
-	mFadeInOutOverlay->drawPolygon(rectanglePoints, 4, black, 1, black);
-	mFadeInOutOverlay->setGLProgram(p);
-	mFadeInOutOverlay->getGLProgramState()->setUniformFloat("percent", 0);
-	addChild(mFadeInOutOverlay);
+	// score text
+	{
+		TTFConfig labelConfig;
+		labelConfig.fontFilePath = "1980XX.ttf";
+		labelConfig.fontSize = 64;
+		labelConfig.glyphs = GlyphCollection::DYNAMIC;
+		labelConfig.outlineSize = 0;
+		labelConfig.customGlyphs = nullptr;
+		labelConfig.distanceFieldEnabled = false;
+
+		mScoreText = cocos2d::Label::createWithTTF(labelConfig, "SCORE");
+		mScoreText->setTextColor(Color4B::WHITE);
+		mScoreText->setPosition(32, 32);
+		mScoreText->getFontAtlas()->setAliasTexParameters();
+		addChild(mScoreText);
+
+		updateScore(0);
+	}
+
+	// fade shader
+	{
+		const auto screenSize = Director::getInstance()->getVisibleSize();
+		mFadeInOutOverlay = cocos2d::DrawNode::create();
+		Vec2 rectanglePoints[4];
+		rectanglePoints[0] = Vec2(screenSize.width / 2, screenSize.height / 2) * -1;
+		rectanglePoints[1] = Vec2(screenSize.width / 2, screenSize.height / 2 * -1);
+		rectanglePoints[2] = Vec2(screenSize.width / 2, screenSize.height / 2);
+		rectanglePoints[3] = Vec2(screenSize.width / 2 * -1, screenSize.height / 2);
+		Color4F black(1, 0, 0, 1);
+		mFadeInOutOverlay->drawPolygon(rectanglePoints, 4, black, 1, black);
+		mFadeInOutOverlay->setGLProgram(p);
+		mFadeInOutOverlay->getGLProgramState()->setUniformFloat("percent", 0);
+		addChild(mFadeInOutOverlay);
+	}
 
 	return true;
 }
@@ -190,6 +215,8 @@ void OddGameScene::update(float delta)
 		auto* onComplete = CallFunc::create([&]() {
 			mWinDelay = nullptr;
 
+			updateScore(mScore + 100);
+
 			// Win!!
 			mPlayer->SetPosition(Vec2(300, 100));
 			for (auto npc = mNPCs.begin(); npc != mNPCs.end(); ++npc)
@@ -202,6 +229,10 @@ void OddGameScene::update(float delta)
 		auto* sequence = Sequence::create(mWinDelay, onComplete, nullptr);
 		mFadeInOutOverlay->runAction(sequence);
 	}
+
+	const auto screenSize = Director::getInstance()->getVisibleSize();
+	mScoreText->setPosition(getDefaultCamera()->getPosition().x - Director::getInstance()->getVisibleSize().width * 0.5f + mScoreText->getContentSize().width * 0.5f +16,
+						getDefaultCamera()->getPosition().y - Director::getInstance()->getVisibleSize().height * -0.5f + mScoreText->getContentSize().height * -0.5f);
 
 	const auto cameraPosition = getDefaultCamera()->getPosition();
 	mFadeInOutOverlay->setPosition(cameraPosition.x, cameraPosition.y);
@@ -227,4 +258,13 @@ void OddGameScene::SetButtonDown(const uint8_t button, const bool isDown)
 	else {
 		mInputBuffer &= ~(1 << button);
 	}
+}
+
+void OddGameScene::updateScore(int newScore)
+{
+	std::stringstream ss;
+	ss << std::setw(5) << std::setfill('0') << newScore;
+
+	mScore = newScore;
+	mScoreText->setString("score: " + ss.str());
 }

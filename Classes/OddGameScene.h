@@ -27,7 +27,12 @@ private:
 	cocos2d::DelayTime* mWinDelay = nullptr;
 	float mSecondsSinceWin = 0.f;
 
+	int mScore = 0;
+	cocos2d::Label* mScoreText;
+
 	uint32_t mInputBuffer = 0;
 	cocos2d::Layer* mGameLayer;
 	cocos2d::Layer* mUILayer;
+
+	void updateScore(int newScore);
 };
