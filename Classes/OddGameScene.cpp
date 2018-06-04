@@ -5,6 +5,7 @@
 #include "GL/glew.h"
 
 #include "OddGameScene.h"
+#include "GameOverScene.h"
 #include "Entity.h"
 #include "Level.h"
 #include "NonPlayerCharacter.h"
@@ -270,7 +271,7 @@ void OddGameScene::update(float delta)
 	// if we run out of time, lose and stuff
 	if (mTimeOfDay > timeInADay && mWinDelay == nullptr) {
 		auto* director = Director::getInstance();
-		director->replaceScene(OddGameScene::createScene());
+		director->replaceScene(GameOverScene::createScene());
 	}
 }
 
