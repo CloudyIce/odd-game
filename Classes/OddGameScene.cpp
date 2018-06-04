@@ -121,16 +121,16 @@ bool OddGameScene::init()
 	p->updateUniforms();
 	CHECK_GL_ERROR_DEBUG();
 
+	TTFConfig labelConfig;
+	labelConfig.fontFilePath = "Helvetica-Regular.ttf";
+	labelConfig.fontSize = 24;
+	labelConfig.glyphs = GlyphCollection::DYNAMIC;
+	labelConfig.outlineSize = 0;
+	labelConfig.customGlyphs = nullptr;
+	labelConfig.distanceFieldEnabled = false;
+
 	// score text
 	{
-		TTFConfig labelConfig;
-		labelConfig.fontFilePath = "Helvetica-Regular.ttf";
-		labelConfig.fontSize = 24;
-		labelConfig.glyphs = GlyphCollection::DYNAMIC;
-		labelConfig.outlineSize = 0;
-		labelConfig.customGlyphs = nullptr;
-		labelConfig.distanceFieldEnabled = false;
-
 		mScoreText = cocos2d::Label::createWithTTF(labelConfig, "SCORE");
 		mScoreText->setTextColor(Color4B::WHITE);
 		mScoreText->setPosition(32, 32);
@@ -140,6 +140,17 @@ bool OddGameScene::init()
 		addChild(mScoreText);
 
 		updateScore(0);
+	}
+
+	// time of day text
+	{
+		mTimeofDayText = cocos2d::Label::createWithTTF(labelConfig, "timeofday");
+		mTimeofDayText->setTextColor(Color4B::WHITE);
+		mTimeofDayText->setPosition(32, 32);
+		mTimeofDayText->getFontAtlas()->setAliasTexParameters();
+		mTimeofDayText->setScale(2.0f);
+		mTimeofDayText->setAnchorPoint(Vec2(0, 1));
+		addChild(mTimeofDayText);
 	}
 
 	// fade shader
@@ -166,6 +177,10 @@ bool OddGameScene::init()
 void OddGameScene::update(float delta) 
 {
 	mPlayer->Update(delta);
+
+	updateTimeOfDay(mTimeOfDay + delta);
+
+	mScoreText->enableOutline(Color4B(Color4F(sin(mTimeOfDay + 2) + 0.5f, sin(mTimeOfDay + 4) + 0.5f, sin(mTimeOfDay) + 0.5f, 1.0f)), 1);
 
 	static float spawnTimer = 0.f;
 	spawnTimer -= delta;
@@ -219,7 +234,7 @@ void OddGameScene::update(float delta)
 		auto* onComplete = CallFunc::create([&]() {
 			mWinDelay = nullptr;
 
-			updateScore(mScore + 100);
+			updateScore(mScore + 1);
 
 			// Win!!
 			mPlayer->SetPosition(Vec2(300, 100));
@@ -235,8 +250,11 @@ void OddGameScene::update(float delta)
 	}
 
 	const auto screenSize = Director::getInstance()->getVisibleSize();
-	mScoreText->setPosition(getDefaultCamera()->getPosition().x - Director::getInstance()->getVisibleSize().width * 0.5f + mScoreText->getContentSize().width * 0.5f - 32,
-						getDefaultCamera()->getPosition().y - Director::getInstance()->getVisibleSize().height * -0.5f + mScoreText->getContentSize().height * -0.5f);
+	mTimeofDayText->setPosition(getDefaultCamera()->getPosition().x - Director::getInstance()->getVisibleSize().width * 0.5f + mScoreText->getContentSize().width * 0.5f - 32,
+							getDefaultCamera()->getPosition().y - Director::getInstance()->getVisibleSize().height * -0.5f + mScoreText->getContentSize().height * -0.5f);
+
+	mScoreText->setPosition(getDefaultCamera()->getPosition().x + 20,
+								getDefaultCamera()->getPosition().y - Director::getInstance()->getVisibleSize().height * -0.5f + mScoreText->getContentSize().height * -0.5f);
 
 	const auto cameraPosition = getDefaultCamera()->getPosition();
 	mFadeInOutOverlay->setPosition(cameraPosition.x, cameraPosition.y);
@@ -246,6 +264,12 @@ void OddGameScene::update(float delta)
 	} else {
 		mSecondsSinceWin = std::max(mSecondsSinceWin - delta, 0.f);
 		mFadeInOutOverlay->getGLProgramState()->setUniformFloat("percent", mSecondsSinceWin);
+	}
+
+	// if we run out of time, lose and stuff
+	if (mTimeOfDay > timeInADay) {
+		auto* director = Director::getInstance();
+		director->replaceScene(OddGameScene::createScene());
 	}
 }
 
@@ -267,8 +291,33 @@ void OddGameScene::SetButtonDown(const uint8_t button, const bool isDown)
 void OddGameScene::updateScore(int newScore)
 {
 	std::stringstream ss;
-	ss << std::setw(5) << std::setfill('0') << newScore;
+	ss << std::setw(3) << std::setfill('0') << newScore;
 
 	mScore = newScore;
-	mScoreText->setString("score: " + ss.str());
+	mScoreText->setString("workdays survived: " + ss.str());
+}
+
+void OddGameScene::updateTimeOfDay(float newTimeOfDay)
+{
+	mTimeOfDay = newTimeOfDay;
+
+	const int numberOfMinutesInAnHour = 60;
+	float timeInSeconds = (mTimeOfDay / timeInADay) * numberOfMinutesInAnHour;
+	int hour = 7 + (timeInSeconds > 30 ? 1 : 0);
+	int minute = (timeInSeconds > 30 ? (timeInSeconds - 30) : (timeInSeconds + 30));
+
+	std::stringstream hourStream;
+	hourStream << std::setw(2) << std::setfill('0') << hour;
+
+	std::stringstream minuteStream;
+	minuteStream << std::setw(2) << std::setfill('0') << minute;
+
+	mTimeofDayText->setString("time: " + hourStream.str() + ":" + minuteStream.str());
+
+	if ((mTimeOfDay / timeInADay > 0.8f) && (static_cast<int>(mTimeOfDay * 4) % 2 == 0)) {
+		mTimeofDayText->enableOutline(Color4B(Color4F(1.f, 0.f, 0.f, 1.f)), 1);
+	}
+	else {
+		mTimeofDayText->enableOutline(Color4B::BLACK, 0);
+	}
 }

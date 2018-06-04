@@ -30,9 +30,14 @@ private:
 	int mScore = 0;
 	cocos2d::Label* mScoreText;
 
+	float mTimeOfDay = 0;
+	cocos2d::Label* mTimeofDayText;
+	const float timeInADay = 15.f;
+
 	uint32_t mInputBuffer = 0;
 	cocos2d::Layer* mGameLayer;
 	cocos2d::Layer* mUILayer;
 
 	void updateScore(int newScore);
+	void updateTimeOfDay(float newTimeOfDay);
 };
