@@ -25,7 +25,7 @@ Entity::~Entity()
 void Entity::Load(std::shared_ptr<Level> level, const char *spriteSheetName)
 {
 	mSprite = Sprite::create(spriteSheetName);
-	mSprite->setAnchorPoint(Vec2(0, 0));
+	mSprite->setAnchorPoint(Vec2(mSprite->getTextureRect().getMinX(), 0));
 	mLevel = level;
 	OnLoad();
 

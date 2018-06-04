@@ -93,7 +93,7 @@ bool OddGameScene::init()
 	mLevel->SetParent(mGameLayer);
 
 	mPlayer = std::unique_ptr<Player>(new Player([this](int button) {return IsButtonDown(button); }));
-	mPlayer->Load(mLevel,"CloseNormal.png");
+	mPlayer->Load(mLevel,"alexidle.png");
 	mPlayer->SetParent(mGameLayer);
 	mPlayer->SetPosition(Vec2(300, 100));
 

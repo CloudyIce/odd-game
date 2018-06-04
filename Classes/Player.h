@@ -20,8 +20,10 @@ private:
 	virtual void OnLoad() override;
 	virtual void OnUnload() override;
 private:
-	//cocos2d::Animation* mAnimation;
-	//cocos2d::Animate* mCurrentAnimation;
+	cocos2d::Animation* mJumpAnimation;
+	cocos2d::Animation* mIdleAnimation;
+	cocos2d::Animation* mRunAnimation;
+	cocos2d::Animate* mCurrentAnimation;
 	const float mMaxInvulnTime = 0.75f;
 	float mInvulnTimer = -1.f;
 

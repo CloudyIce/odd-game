@@ -1,20 +1,25 @@
 #include "Player.h"
 #include <string>
+#include "Level.h"
 
 USING_NS_CC;
 
 namespace {
 
 	constexpr float sBonusUpHitForce = 0.5f;
-
+	constexpr float sCameraYOffset = 120.f;
 }
 
 Player::Player(std::function<bool(int)> buttonDownFunction)
 	: mCheckButtonDownFunction(buttonDownFunction)
+	, mJumpAnimation	(nullptr)
+	, mIdleAnimation	(nullptr)
+	, mRunAnimation		(nullptr)
+	, mCurrentAnimation	(nullptr)
 {
-	mColliderSize = { 32, 48 };
-	mColliderOffset = { 8, 0 };
-	mDefaultSpeed = 4000.f;
+	mColliderSize = { 32.f, 64 };
+	mColliderOffset = { 32, 0 };
+	mDefaultSpeed = 7000.f;
 }
 
 Player::~Player()
@@ -59,8 +64,10 @@ bool Player::CanJump(const bool newJump) const
 
 void Player::OnTick(const float deltaTime) 
 {
-
-	mCamera->setPosition(GetPosition());
+	const auto newCameraPosition = Vec2(GetPosition().x, GetPosition().y + sCameraYOffset);
+	mCamera->setPosition(newCameraPosition);
+	mLevel->OnPlayerCameraUpdated(newCameraPosition);
+	
 	// Jump Timers
 	if (IsOnGround()) {
 		mJumpDelayTimer = -1.f;
@@ -80,7 +87,7 @@ void Player::OnTick(const float deltaTime)
 	mInvulnTimer -= deltaTime;
 	if (mInvulnTimer <= 0.f)
 	{
-		mSprite->setOpacity(100);
+		mSprite->setOpacity(255);
 	}
 
 	//
@@ -115,7 +122,47 @@ void Player::OnTick(const float deltaTime)
 	if (ddPos.x != 0.f) 
 	{
 		mSprite->setFlippedX(ddPos.x < 0);
+		if (mCurrentAnimation != nullptr) {
+			if (mCurrentAnimation->getAnimation() != mRunAnimation && IsOnGround()) {
+				mSprite->stopAction(mCurrentAnimation);
+				mCurrentAnimation = Animate::create(mRunAnimation);
+				mSprite->runAction(mCurrentAnimation);
+			}
+		}
+		else {
+			mCurrentAnimation = Animate::create(mRunAnimation);
+			mSprite->runAction(mCurrentAnimation);
+		}
 	}
+	else if (!IsOnGround()) {
+		if (mCurrentAnimation != nullptr) {
+			if (mCurrentAnimation->getAnimation() != mJumpAnimation) {
+				mSprite->stopAction(mCurrentAnimation);
+				mCurrentAnimation = Animate::create(mJumpAnimation);
+				mSprite->runAction(mCurrentAnimation);
+			}
+		}
+		else {
+			mCurrentAnimation = Animate::create(mJumpAnimation);
+			mSprite->runAction(mCurrentAnimation);
+		}
+	}
+	else
+	{
+		if (mCurrentAnimation != nullptr) {
+			if (mCurrentAnimation->getAnimation() != mIdleAnimation) {
+				mSprite->stopAction(mCurrentAnimation);
+				mCurrentAnimation = Animate::create(mIdleAnimation);
+ 				mSprite->runAction(mCurrentAnimation);
+			}
+		}
+		else {
+			mCurrentAnimation = Animate::create(mIdleAnimation);
+			mSprite->runAction(mCurrentAnimation);
+		}
+	}
+
+	
 
 	SetddPos(ddPos);
 }
@@ -129,8 +176,41 @@ void Player::OnSetParent(cocos2d::Node* parent)
 
 void Player::OnLoad()
 {
+	mSprite->setScale(0.5f);
+
+	// Build Animations
+	mRunAnimation = cocos2d::Animation::create();
+	mIdleAnimation = cocos2d::Animation::create();
+	mJumpAnimation = cocos2d::Animation::create();
+	mRunAnimation->init();
+	mIdleAnimation->init();
+	mJumpAnimation->init();
+	mRunAnimation ->retain();
+	mIdleAnimation->retain();
+	mJumpAnimation->retain();
+
+	const auto rect = Rect(0, 0, 184, 201);
+	mIdleAnimation->addSpriteFrame(cocos2d::SpriteFrame::create("alexidle.png", rect));
+
+	mRunAnimation->addSpriteFrame(cocos2d::SpriteFrame::create("alexwalk1.png", rect));
+	mRunAnimation->addSpriteFrame(cocos2d::SpriteFrame::create("alexwalk2.png", rect));
+	mRunAnimation->addSpriteFrame(cocos2d::SpriteFrame::create("alexwalk3.png", rect));
+	mRunAnimation->addSpriteFrame(cocos2d::SpriteFrame::create("alexwalk2.png", rect));
+
+	mJumpAnimation->addSpriteFrame(cocos2d::SpriteFrame::create("alexwalk1.png", rect));
+
+	mRunAnimation->setDelayPerUnit(0.1f);
+	mIdleAnimation->setDelayPerUnit(0.25f);
+	mJumpAnimation->setDelayPerUnit(0.25f);
+	mRunAnimation->setLoops(-1);
+	mIdleAnimation->setLoops(-1);
+	mJumpAnimation->setLoops(-1);
 }
 
 void Player::OnUnload() 
 {
+	mSprite->stopAction(mCurrentAnimation);
+	mRunAnimation->release();
+	mIdleAnimation->release();
+	mJumpAnimation->release();
 }
