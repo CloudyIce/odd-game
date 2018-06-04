@@ -154,6 +154,8 @@ bool OddGameScene::init()
 		mFadeInOutOverlay->setGLProgram(p);
 		mFadeInOutOverlay->getGLProgramState()->setUniformFloat("percent", 0);
 		addChild(mFadeInOutOverlay);
+
+		mSecondsSinceWin = 1.0f;
 	}
 
 	return true;
