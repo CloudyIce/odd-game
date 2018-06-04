@@ -5,6 +5,7 @@
 #include "Player.h"
 #include "NonPlayerCharacter.h"
 
+class DrawNode;
 class Level;
 
 class OddGameScene : public cocos2d::Scene
@@ -22,7 +23,16 @@ private:
 	std::shared_ptr<Level> mLevel;
 	std::vector<std::unique_ptr<NonPlayerCharacter>> mNPCs;
 
+	cocos2d::DrawNode* mFadeInOutOverlay;
+	cocos2d::DelayTime* mWinDelay = nullptr;
+	float mSecondsSinceWin = 0.f;
+
+	int mScore = 0;
+	cocos2d::Label* mScoreText;
+
 	uint32_t mInputBuffer = 0;
 	cocos2d::Layer* mGameLayer;
 	cocos2d::Layer* mUILayer;
+
+	void updateScore(int newScore);
 };
