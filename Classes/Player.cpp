@@ -87,7 +87,7 @@ void Player::OnTick(const float deltaTime)
 	mInvulnTimer -= deltaTime;
 	if (mInvulnTimer <= 0.f)
 	{
-		mSprite->setOpacity(255);
+		mSprite->setOpacity(256);
 	}
 
 	//

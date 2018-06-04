@@ -16,8 +16,8 @@ private:
 	virtual void OnLoad() override;
 	virtual void OnUnload() override;
 private:
-	//cocos2d::Animation* mAnimation;
-	//cocos2d::Animate* mCurrentAnimation;
+	cocos2d::Animation* mAnimation;
+	cocos2d::Animate* mCurrentAnimation;
 	float mIntentDirection = 1.f;
 
 	const float mJumpLengthMin = 0.4f;

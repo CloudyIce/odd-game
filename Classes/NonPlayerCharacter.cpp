@@ -3,10 +3,15 @@
 
 USING_NS_CC;
 
+namespace 
+{
+	constexpr int sSpriteVariations = 1;
+}
+
 NonPlayerCharacter::NonPlayerCharacter()
 {
-	mColliderSize = { 32, 48 };
-	mColliderOffset = { 8, 0 };
+	mColliderSize = { 32.f, 64 };
+	mColliderOffset = { 32, 0 };
 	mDefaultSpeed = 1000.f * cocos2d::RandomHelper::random_int(2, 5);
 }
 
@@ -50,9 +55,28 @@ void NonPlayerCharacter::OnSetParent(cocos2d::Node* parent)
 
 void NonPlayerCharacter::OnLoad()
 {
+	mSprite->setScale(0.5f);
+	mSprite->setColor(Color3B(RandomHelper::random_int(155, 255), RandomHelper::random_int(155, 255), RandomHelper::random_int(155, 255)));
+	mSprite->setOpacity(200);
 
+	mAnimation = cocos2d::Animation::create();
+	mAnimation->init();
+	mAnimation->retain();
+
+	const auto rect = Rect(0, 0, 184, 201);
+	const auto variation = std::to_string(RandomHelper::random_int(1, sSpriteVariations));
+	mAnimation->addSpriteFrame(cocos2d::SpriteFrame::create("npc" + variation + "walk1.png", rect));
+	mAnimation->addSpriteFrame(cocos2d::SpriteFrame::create("npc"+ variation+ "walk2.png", rect));
+
+	mAnimation->setDelayPerUnit(0.1f/(mDefaultSpeed*0.0002f));
+	mAnimation->setLoops(-1);
+
+	mCurrentAnimation = Animate::create(mAnimation);
+	mSprite->runAction(mCurrentAnimation);
 }
 
 void NonPlayerCharacter::OnUnload() 
 {
+	mCurrentAnimation->stop();
+	mAnimation->release();
 }
