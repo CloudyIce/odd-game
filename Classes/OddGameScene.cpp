@@ -14,7 +14,7 @@ USING_NS_CC;
 
 namespace 
 {
-	constexpr float sEndY = 1920.f;
+	constexpr float sEndY = 92*32;
 }
 
 
@@ -101,7 +101,7 @@ bool OddGameScene::init()
 	mPlayer = std::unique_ptr<Player>(new Player([this](int button) {return IsButtonDown(button); }));
 	mPlayer->Load(mLevel,"alexidle.png");
 	mPlayer->SetParent(mGameLayer);
-	mPlayer->SetPosition(Vec2(300, 100));
+	mPlayer->SetPosition(Vec2(32*4, 32*14));
 
 	const GLchar* fragmentSource = "uniform float percent;\
 		void main() \
@@ -193,12 +193,12 @@ void OddGameScene::update(float delta)
 
 		if(cocos2d::RandomHelper::random_int(-2,2) > 1) 
 		{
-			newNPC->SetPosition(Vec2((mLevel->GetMapSize().x*32)-10, (mLevel->GetMapSize().y * 32)+32));
+			newNPC->SetPosition(Vec2((mLevel->GetMapSize().x*32)-10 -(32*19), (mLevel->GetMapSize().y * 32)+128));
 			newNPC->SetDirection(-1);
 		}
 		else
 		{
-			newNPC->SetPosition(Vec2(10, (mLevel->GetMapSize().y * 32) + 32));
+			newNPC->SetPosition(Vec2(10, (mLevel->GetMapSize().y * 32) + 128));
 			newNPC->SetDirection(1);
 		}
 		
@@ -238,7 +238,7 @@ void OddGameScene::update(float delta)
 			updateScore(mScore + 1);
 
 			// Win!!
-			mPlayer->SetPosition(Vec2(300, 100));
+			mPlayer->SetPosition(Vec2(32 * 4, 32 * 14));
 			for (auto npc = mNPCs.begin(); npc != mNPCs.end(); ++npc)
 			{
 				(*npc)->Unload();
