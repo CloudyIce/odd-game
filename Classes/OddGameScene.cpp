@@ -233,6 +233,7 @@ void OddGameScene::update(float delta)
 		mSecondsSinceWin = 0.f;
 		auto* onComplete = CallFunc::create([&]() {
 			mWinDelay = nullptr;
+			mTimeOfDay = 0;
 
 			updateScore(mScore + 1);
 
@@ -267,7 +268,7 @@ void OddGameScene::update(float delta)
 	}
 
 	// if we run out of time, lose and stuff
-	if (mTimeOfDay > timeInADay) {
+	if (mTimeOfDay > timeInADay && mWinDelay == nullptr) {
 		auto* director = Director::getInstance();
 		director->replaceScene(OddGameScene::createScene());
 	}
